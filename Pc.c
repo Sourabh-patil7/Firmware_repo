@@ -55,12 +55,16 @@ int main()
     usleep(1000000);
 
     int r = read(Serial_port, received_string, sizeof(received_string))
-    if(r == -1) {
-        printf("Error in recieving data\n");
-        return 1;
+    if(r > 0) {
+        received_string[r] = '\0'
+	printf("Received string from arduino is : %s\n",received_string);
+
     }
-    printf("REcieved string from arduino is : %s\n",received_string);
-    
+    else 
+    { 
+    	printf("Error in recieving data from Serial port\n");
+    }
+
     close(Serial_port);
     return 0;
 
