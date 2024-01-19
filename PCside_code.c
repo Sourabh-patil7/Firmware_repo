@@ -4,6 +4,8 @@
 #include<string.h>
 #include<unistd.h>
 #include<stdlib.h>
+#include<time.h>
+#define BYTES_TO_RECEIVE 1000
 int main()
 {
     struct termios tty;
@@ -43,29 +45,46 @@ int main()
     }
 
     char data[] = "Finance Minister Arun Jaitley Tuesday hit out at former RBI governor Raghuram Rajan for predicting that the next banking crisis would be triggered by MSME lending, saying postmortem is easier than taking action when it was required. Rajan, who had as the chief economist at IMF warned of impending financial crisis of 2008, in a note to a parliamentary committee warned against ambitious credit targets and loan waivers, saying that they could be the sources of next banking crisis. Government should focus on sources of the next crisis, not just the last one.In particular, government should refrain from setting ambitious credit targets or waiving loans. Credit targets are sometimes achieved by abandoning appropriate due diligence, creating the environment for future NPAs, Rajan said in the note.Both MUDRA loans as well as the Kisan Credit Card, while popular, have to be examined more closely for potential credit risk. Rajan, who was RBI governor for three years till September 2016, is currently."
+;
+    char received_string[BYTES_TO_RECEIVE];
 
-    char received_string[1000];
-
+    //Write string  to Serial port , from where arduino UDR0 will read
     int w = write(Serial_port, data, sizeof(data));
     if(w == -1 ) {
-        printf("Error in sending data\n")
+        printf("Error in sending data\n");
+	close(Serial_port);
         return 1;
     }
 
-    usleep(1000000);
+    
 
-    int r = read(Serial_port, received_string, sizeof(received_string))
-    if(r > 0) {
-        received_string[r] = '\0'
-	printf("Received string from arduino is : %s\n",received_string);
+    clock_t start = clock();
+    int total_received = 0;
 
-    }
-    else 
-    { 
-    	printf("Error in recieving data from Serial port\n");
+    //Receive string to buffer (receive_string), read through serial port
+    while (total_received < BYTES_TO_RECEIVE) {
+        int r = read(Serial_port, received_string, sizeof(received_string));
+        if (r > 0) {
+            received_string[r] = '\0';
+            total_received += r;
+
+            // Calculate speed and print
+            clock_t end = clock();
+            double elapsed_time = ((double) (end - start)) / CLOCKS_PER_SEC;
+            double speed = (total_received * 8) / elapsed_time;  // Speed in bits per second
+
+            printf("Received string from Arduino is: %s\n", received_string);
+            printf("Transmission speed: %.2f bits/second\n", speed);
+
+            start = clock();  // Reset
+        } 
+	else 
+	{
+            printf("Error in receiving data from the serial port\n");
+            break;
+        }
     }
 
     close(Serial_port);
     return 0;
-
 }
