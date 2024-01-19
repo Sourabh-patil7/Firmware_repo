@@ -22,6 +22,8 @@ int main()
         close(Serial_port);
         return 1;        
     }
+
+    //Configure Serial port with same setting as of in arduino
     cfsetospeed(&tty, B2400);
     cfsetispeed(&tty, B2400);
 
