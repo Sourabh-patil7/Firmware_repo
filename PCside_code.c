@@ -90,3 +90,10 @@ int main()
     close(Serial_port);
     return 0;
 }
+
+
+void Function ()
+{
+	printf ("This is my PersonalCode\n") ;
+	printf ("Please have a Look\n" ) ;
+}
